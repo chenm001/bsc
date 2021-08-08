@@ -2185,8 +2185,8 @@ checkInstArgs port_ids avi =
         dynamic_iarg_errs =
             if (null dynamic_iarg_pairs)
             then []
-            else [(getPosition inst_name,
-                   EBSimDynamicArg (getIdString inst_name) dynamic_iarg_names)]
+            else [] --[(getPosition inst_name,
+                   --EBSimDynamicArg (getIdString inst_name) dynamic_iarg_names)]
 
     in
         -- report as many at once

@@ -1360,9 +1360,8 @@ memberDecl sb_map sbid aid args =
 mkCtor :: Maybe String -> SimCCBlock  -> CCFragment
 mkCtor scope sb =
   let prefix = maybe "" (++ "::") scope
-      args = [ (aTypeToCType ty) (aArgIdToCLval arg_id)
-             | (ty, arg_id, isPort) <- sb_parameters sb
-             ]
+      args = [(reference . constant . aTypeToCType ty) (aArgIdToCLval arg_id) | (ty, arg_id, True)  <- sb_parameters sb]
+          ++ [(                       aTypeToCType ty) (aArgIdToCLval arg_id) | (ty, arg_id, False) <- sb_parameters sb]
   in ctor (mkVar (prefix ++ pfxMod ++ (sb_name sb)))
           ([ (userType "tSimStateHdl") $ (mkVar "simHdl")
            , ptr . constant . CCSyntax.char $ (mkVar "name")
@@ -1603,7 +1602,7 @@ simCCBlockToClassDeclaration sb_map sb =
       rdefs       = [ decl $ (aTypeToCType ty) (aPortIdToCLval id)
                     | (ty,id) <- sb_resetDefs sb ]
       reset_defs  = [comment "Reset signal definitions" (private rdefs)]
-      mpdefs      = [ decl $ (aTypeToCType ty) (aPortIdToCLval arg_id)
+      mpdefs      = [ decl $ (reference . constant . aTypeToCType ty) (aPortIdToCLval arg_id)
                     | (ty, arg_id, True) <- sb_parameters sb ] ++
                     [ decl $ (aTypeToCType ty) (aPortIdToCLval (vName_to_id vn))
                     | (ty,_,vn) <- sb_methodPorts sb ]
